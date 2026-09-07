@@ -2,6 +2,9 @@
 import { ref, reactive, computed } from 'vue'
 import { apiClient } from '@shared/api/api-client'
 import { BaseButton, BaseInput, BaseModal } from '@shared/ui'
+import { useToast } from '@shared/lib/toast/use-toast' // Импортируем хук
+
+const { show } = useToast() // Инициализируем метод show
 
 // Описываем типы для события успешного создания
 const emit = defineEmits<{
@@ -56,6 +59,9 @@ const onSubmit = async () => {
       ...form,
       status: 'active',
     })
+
+    // ВЫЗОВ ТОСТА: Показываем красивое зеленое уведомление
+    show(`Сотрудник ${form.name} успешно добавлен в систему AuraHQ`, 'success')
 
     isOpen.value = false // Закрываем модалку при успехе
     emit('success') // Оповещаем родительскую страницу о необходимости обновить таблицу

@@ -5,6 +5,7 @@ import { Sidebar } from '@widgets/sidebar'
 
 const route = useRoute()
 const userStore = useUserStore()
+import { BaseToaster } from '@shared/ui'
 </script>
 
 <template>
@@ -28,6 +29,9 @@ const userStore = useUserStore()
   <div v-else class="min-h-screen bg-slate-50">
     <RouterView />
   </div>
+
+  <!-- Глобальный слушатель тостов -->
+  <BaseToaster />
 </template>
 
 <style>
