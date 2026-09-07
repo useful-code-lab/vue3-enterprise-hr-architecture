@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { apiClient } from '@shared/api/api-client'
 import { BaseButton, BaseInput } from '@shared/ui'
+import { AddEmployeeModal } from '@features/add-employee'
 
 interface Employee {
   id: string
@@ -51,6 +52,18 @@ const getStatusLabel = (status: Employee['status']) => {
   const labels = { active: 'Активен', on_vacation: 'В отпуске', fired: 'Уволен' }
   return labels[status]
 }
+
+const refreshEmployees = async () => {
+  try {
+    isLoading.value = true
+    const response = await apiClient.get<Employee[]>('/employees')
+    employees.value = response.data
+  } catch {
+    networkError.value = 'Не удалось обновить список.'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -63,7 +76,8 @@ const getStatusLabel = (status: Employee['status']) => {
           Поиск, фильтрация и администрирование прав доступа сотрудников AuraHQ
         </p>
       </div>
-      <BaseButton variant="primary" size="md">+ Добавить сотрудника</BaseButton>
+      <!-- Теперь при успешном сохранении таблица сама пошлет запрос и обновит строки -->
+      <AddEmployeeModal @success="refreshEmployees" />
     </div>
 
     <!-- Панель инструментов (Поиск и фильтры) -->

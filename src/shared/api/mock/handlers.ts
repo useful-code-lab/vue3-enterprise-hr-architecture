@@ -98,4 +98,22 @@ export const handlers = [
       },
     ])
   }),
+  // Добавьте эту ручку внутрь массива handlers
+  http.post('/api/employees', async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || authHeader !== 'Bearer valid-senior-access-token') {
+      return new HttpResponse(null, { status: 401 })
+    }
+
+    const newEmployee = (await request.json()) as Record<string, unknown>
+
+    // Возвращаем созданного сотрудника с фейковым сгенерированным ID
+    return HttpResponse.json(
+      {
+        id: `emp_${Math.floor(Math.random() * 1000)}`,
+        ...newEmployee,
+      },
+      { status: 201 },
+    )
+  }),
 ]
