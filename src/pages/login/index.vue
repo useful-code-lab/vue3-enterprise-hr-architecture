@@ -3,6 +3,7 @@ import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@entities/user/model/store'
 import { BaseButton, BaseInput } from '@shared/ui'
+import { apiClient } from '@shared/api/api-client'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -18,22 +19,27 @@ const isLoading = ref(false)
 const submitError = ref('')
 
 // Стейт для отслеживания того, пытался ли пользователь уже отправить форму
-const isSubmitedOnce = ref(false)
+const isSubmittedOnce = ref(false)
 
 // 2. Инлинейная Senior-валидация без лишних библиотек
+// 2. Валидация данных на клиенте (Исправленная Senior-версия)
 const errors = computed(() => {
   const currentErrors = { email: '', password: '' }
 
-  if (!isSubmitedOnce.value) return currentErrors
+  // КРИТИЧЕСКИЙ МОМЕНТ: Если пользователь ЕЩЕ НЕ НАЖИМАЛ кнопку отправки,
+  // мы принудительно возвращаем пустые ошибки, чтобы форма была валидна изначально!
+  if (!isSubmittedOnce.value) {
+    return currentErrors
+  }
 
-  // Валидация Email
+  // Проверка Email (запускается только ПОСЛЕ первого клика по кнопке)
   if (!form.email) {
     currentErrors.email = 'Поле Email обязательно для заполнения'
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     currentErrors.email = 'Введите корректный адрес электронной почты'
   }
 
-  // Валидация Пароля
+  // Проверка Пароля (запускается только ПОСЛЕ первого клика по кнопке)
   if (!form.password) {
     currentErrors.password = 'Поле Пароль обязательно для заполнения'
   } else if (form.password.length < 6) {
@@ -48,25 +54,33 @@ const isFormValid = computed(() => !errors.value.email && !errors.value.password
 
 // 3. Обработка отправки формы
 const onSubmit = async () => {
-  isSubmitedOnce.value = true
+  isSubmittedOnce.value = true
   submitError.value = ''
 
   if (!isFormValid.value) return
 
   isLoading.value = true
   try {
-    // В реальном приложении здесь будет вызов фичи AuthByEmail или прямой запрос к API.
-    // Имитируем запись токенов (которые затем подхватит наш MSW / API Client)
-    localStorage.setItem('accessToken', 'mock-initial-access-token')
-    localStorage.setItem('refreshToken', 'mock-initial-refresh-token')
+    // 1. Делаем настоящий POST-запрос через Axios в MSW
+    const response = await apiClient.post('/auth/login', {
+      email: form.email,
+      password: form.password,
+    })
 
-    // Получаем профиль пользователя через Pinia-хранилище
+    const { accessToken, refreshToken } = response.data
+
+    // 2. Сохраняем токены
+    localStorage.setItem('accessToken', accessToken)
+    localStorage.setItem('refreshToken', refreshToken)
+
+    // 3. Вызываем метод Pinia, который сделает GET-запрос на /auth/me с токеном в заголовке
     await userStore.fetchProfile()
 
-    // Перенаправляем на главный дашборд
+    // 4. Редирект
     await router.push({ name: 'dashboard' })
-  } catch {
-    submitError.value = 'Неверный Email или пароль. Попробуйте снова.'
+  } catch (error) {
+    // Обрабатываем ошибку ответа от MSW
+    submitError.value = error.response?.data?.message || 'Ошибка соединения с сервером.'
   } finally {
     isLoading.value = false
   }

@@ -5,11 +5,12 @@ import { router } from '@app/providers/router'
 import '@app/styles/main.css'
 
 async function prepareApp() {
-  // Включаем перехватчик сетевых запросов только локально
+  // Активируем Service Worker только во время локальной разработки
   if (import.meta.env.DEV) {
     const { worker } = await import('@shared/api/mock/browser')
+    // Метод start() возвращает Promise, дожидаемся его активации
     await worker.start({
-      onUnhandledRequest: 'bypass', // Не ругаться на запросы к ассетам Vite
+      onUnhandledRequest: 'bypass', // Игнорируем запросы к ассетам Vite (.vue, .css)
     })
   }
 }

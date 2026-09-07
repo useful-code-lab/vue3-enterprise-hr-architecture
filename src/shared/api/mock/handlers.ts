@@ -1,29 +1,47 @@
 import { http, HttpResponse } from 'msw'
 
+interface LoginRequestBody {
+  email?: string
+  password?: string
+}
+
 export const handlers = [
-  // Имитируем ручку получения профиля /auth/me
+  http.post('/api/auth/login', async ({ request }) => {
+    const body = (await request.json()) as LoginRequestBody
+
+    if (body.email === 'admin@aurahq.io' && body.password === '123456') {
+      return HttpResponse.json({
+        accessToken: 'valid-senior-access-token',
+        refreshToken: 'valid-senior-refresh-token',
+      })
+    }
+
+    return new HttpResponse(JSON.stringify({ message: 'Неверный Email или пароль' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+
   http.get('/api/auth/me', ({ request }) => {
     const authHeader = request.headers.get('Authorization')
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || authHeader !== 'Bearer valid-senior-access-token') {
       return new HttpResponse(null, { status: 401 })
     }
 
-    // Возвращаем фейковый профиль сотрудника уровня Senior
     return HttpResponse.json({
       id: 'usr_99210',
-      email: 'alex@aurahq.io',
-      name: 'Алексей',
+      email: 'admin@aurahq.io',
+      name: 'Алексей (Admin)',
       role: 'admin',
       avatarUrl: 'https://dicebear.com',
     })
   }),
 
-  // Имитируем ручку обновления токенов
   http.post('/api/auth/refresh', () => {
     return HttpResponse.json({
-      accessToken: 'new-secure-access-token',
-      newRefreshToken: 'new-secure-refresh-token',
+      accessToken: 'valid-senior-access-token',
+      newRefreshToken: 'valid-senior-refresh-token',
     })
   }),
 ]
