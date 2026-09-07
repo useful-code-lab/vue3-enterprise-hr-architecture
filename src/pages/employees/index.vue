@@ -66,6 +66,28 @@ const refreshEmployees = async () => {
     isLoading.value = false
   }
 }
+
+// 1. Стейт пагинации (добавьте ниже существующих ref-переменных)
+const currentPage = ref(1)
+const itemsPerPage = ref(5) // Показывать по 5 сотрудников на страницу
+
+// 2. Сброс на 1-ю страницу при изменении поискового запроса или фильтра ролей
+// Чтобы избежать бага, когда пользователь ищет на 3-й странице и получает пустой экран
+const handleFilterChange = () => {
+  currentPage.value = 1
+}
+
+// 3. Вычисление общего количества страниц
+const totalPages = computed(() => {
+  return Math.ceil(filteredEmployees.value.length / itemsPerPage.value) || 1
+})
+
+// 4. Конечный массив сотрудников, который пойдет в цикл v-for
+const paginatedEmployees = computed(() => {
+  const startIndex = (currentPage.value - 1) * itemsPerPage.value
+  const endIndex = startIndex + itemsPerPage.value
+  return filteredEmployees.value.slice(startIndex, endIndex)
+})
 </script>
 
 <template>
@@ -90,6 +112,7 @@ const refreshEmployees = async () => {
         <BaseInput
           id="search-employee"
           v-model="searchQuery"
+          @update:model-value="handleFilterChange"
           type="text"
           label="Поиск сотрудника"
           placeholder="Введите имя, email или отдел..."
@@ -163,7 +186,7 @@ const refreshEmployees = async () => {
             <!-- Основной контент таблицы (когда загрузка завершена) -->
             <template v-else>
               <tr
-                v-for="employee in filteredEmployees"
+                v-for="employee in paginatedEmployees"
                 :key="employee.id"
                 class="hover:bg-[var(--color-ui-bg)] border-[var(--color-ui-border)] transition-colors"
               >
@@ -218,6 +241,42 @@ const refreshEmployees = async () => {
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+  <!-- Панель пагинации (Pagination Controls) -->
+  <div
+    class="flex items-center justify-between bg-[var(--color-ui-card)] px-4 py-3 rounded-xl border border-[var(--color-ui-border)] shadow-xs"
+  >
+    <div class="text-xs text-slate-500 font-medium">
+      Показано с {{ (currentPage - 1) * itemsPerPage + 1 }} по
+      {{ Math.min(currentPage * itemsPerPage, filteredEmployees.length) }}
+      из {{ filteredEmployees.length }} сотрудников
+    </div>
+
+    <div class="flex items-center gap-2">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="currentPage === 1"
+        @click="currentPage--"
+      >
+        ← Назад
+      </BaseButton>
+
+      <span
+        class="text-xs font-semibold px-3 py-1 bg-[var(--color-ui-bg)] rounded-md border border-[var(--color-ui-border)] text-[var(--color-ui-text)]"
+      >
+        Страница {{ currentPage }} из {{ totalPages }}
+      </span>
+
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="currentPage === totalPages"
+        @click="currentPage++"
+      >
+        Вперед →
+      </BaseButton>
     </div>
   </div>
 </template>
