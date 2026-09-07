@@ -219,7 +219,6 @@ const paginatedEmployees = computed(() => {
                   </span>
                 </td>
                 <td class="px-6 py-4 text-right space-x-2">
-                  <BaseButton variant="secondary" size="sm">Изменить</BaseButton>
                   <!-- Передаем объект сотрудника текущей строки и подписываемся на обновление списка -->
                   <EditEmployeeModal :employee="employee" @success="refreshEmployees" />
                   <!-- Наша изолированная фича удаления для каждой строки -->
