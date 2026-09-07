@@ -7,14 +7,15 @@
     "noUncheckedIndexedAccess": true,
 
     // Path mapping for cleaner imports.
-    "paths": {
-    "@app/*": ["src/app/*"],
-      "@pages/*": ["src/pages/*"],
-      "@widgets/*": ["src/widgets/*"],
-      "@features/*": ["src/features/*"],
-      "@entities/*": ["src/entities/*"],
-      "@shared/*": ["src/shared/*"]
-    },
+  "paths": {
+    "@app/*": ["./src/app/*"],
+    "@pages/*": ["./src/pages/*"],
+    "@widgets/*": ["./src/widgets/*"],
+    "@features/*": ["./src/features/*"],
+    "@entities/*": ["./src/entities/*"],
+    "@shared/*": ["./src/shared/*"]
+  },
+
 
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
     // Specified here to keep it out of the root directory.
