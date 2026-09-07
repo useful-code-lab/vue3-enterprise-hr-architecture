@@ -130,4 +130,28 @@ export const handlers = [
 
     return HttpResponse.json(createdEmployee, { status: 201 })
   }),
+  // Добавьте эту ручку в массив handlers
+  http.delete('/api/employees/:id', ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || authHeader !== 'Bearer valid-senior-access-token') {
+      return new HttpResponse(null, { status: 401 })
+    }
+
+    const { id } = params
+
+    // Находим индекс сотрудника в нашей InMemory БД
+    const index = employeesDb.findIndex((emp) => emp.id === id)
+
+    if (index === -1) {
+      return new HttpResponse(JSON.stringify({ message: 'Сотрудник не найден' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Удаляем сотрудника из базы в памяти
+    const deletedEmployee = employeesDb.splice(index, 1)[0]
+
+    return HttpResponse.json({ success: true, id: deletedEmployee.id })
+  }),
 ]

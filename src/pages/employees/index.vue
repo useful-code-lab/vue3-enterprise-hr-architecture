@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { apiClient } from '@shared/api/api-client'
 import { BaseButton, BaseInput } from '@shared/ui'
 import { AddEmployeeModal } from '@features/add-employee'
+import { DeleteEmployeeButton } from '@features/delete-employee'
 
 interface Employee {
   id: string
@@ -191,8 +192,15 @@ const refreshEmployees = async () => {
                     {{ getStatusLabel(employee.status) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-6 py-4 text-right space-x-2">
                   <BaseButton variant="secondary" size="sm">Изменить</BaseButton>
+
+                  <!-- Наша изолированная фича удаления для каждой строки -->
+                  <DeleteEmployeeButton
+                    :employee-id="employee.id"
+                    :employee-name="employee.name"
+                    @success="refreshEmployees"
+                  />
                 </td>
               </tr>
 
