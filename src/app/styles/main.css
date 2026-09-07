@@ -1,18 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  /* Кастомная дизайн-система для AuraHQ уровня Enterprise */
+  /* Базовая дизайн-система */
   --color-brand-primary: #3b82f6;
   --color-brand-dark: #0f172a;
   --color-brand-success: #10b981;
-  
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Реактивные семантические переменные, которые будут менять значение */
+  --color-ui-bg: #f9fafb;        /* Светлый фон по умолчанию */
+  --color-ui-card: #ffffff;      /* Светлая карточка */
+  --color-ui-text: #0f172a;      /* Темный текст */
+  --color-ui-border: #e2e8f0;    /* Светлая граница */
 }
 
+/* Переопределение переменных для темной темы */
+html[data-theme="dark"] {
+  --color-ui-bg: #0b0f19;        /* Глубокий темный фон */
+  --color-ui-card: #151b2c;      /* Темная карточка/панель */
+  --color-ui-text: #f1f5f9;      /* Светлый текст */
+  --color-ui-border: #1e293b;    /* Темная граница */
+}
+
+/* Применяем семантические цвета к базовым тегам */
 html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--color-slate-50);
-  color: var(--color-brand-dark);
+  background-color: var(--color-ui-bg);
+  color: var(--color-ui-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

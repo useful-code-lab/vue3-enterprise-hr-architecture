@@ -4,6 +4,7 @@ import { useUserStore } from '@entities/user/model/store'
 import { BaseButton } from '@shared/ui'
 import ResourceChart from '@widgets/analytics/ui/ResourceChart.vue'
 import { useRouter } from 'vue-router'
+import { useTheme } from '@shared/lib/theme/use-theme'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -32,6 +33,10 @@ const handleLogout = () => {
   userStore.logout()
   window.location.reload() // Мягкий сброс сессии и редирект силами роутера
 }
+
+const { theme, toggleTheme, initTheme } = useTheme()
+// Инициализируем тему при загрузке компонента дашборда
+initTheme()
 </script>
 
 <template>
@@ -60,6 +65,9 @@ const handleLogout = () => {
           alt="Avatar"
           class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200"
         />
+        <BaseButton variant="secondary" size="sm" @click="toggleTheme">
+          {{ theme === 'light' ? '🌙 Темная' : '☀️ Светлая' }}
+        </BaseButton>
         <BaseButton variant="secondary" size="sm" @click="handleLogout"> Выйти </BaseButton>
       </div>
     </header>

@@ -152,6 +152,6 @@ export const handlers = [
     // Удаляем сотрудника из базы в памяти
     const deletedEmployee = employeesDb.splice(index, 1)[0]
 
-    return HttpResponse.json({ success: true, id: deletedEmployee.id })
+    return HttpResponse.json({ success: true, id: deletedEmployee?.id })
   }),
 ]

@@ -83,7 +83,7 @@ const refreshEmployees = async () => {
 
     <!-- Панель инструментов (Поиск и фильтры) -->
     <div
-      class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-4 items-end"
+      class="bg-[var(--color-ui-card)] p-4 rounded-xl border border-[var(--color-ui-border)] shadow-xs flex flex-col sm:flex-row gap-4 items-end"
     >
       <div class="flex-1 w-full">
         <BaseInput
@@ -100,7 +100,7 @@ const refreshEmployees = async () => {
         <select
           id="filter-role"
           v-model="activeFilterRole"
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-blue-100 transition-colors"
+          class="w-full px-3 py-2 border border-[var(--color-ui-border)] rounded-lg text-sm bg-[var(--color-ui-card)] text-[var(--color-ui-text)] focus:outline-none focus:border-[var(--color-brand-primary)] transition-colors"
         >
           <option value="all">Все роли</option>
           <option value="admin">Администратор</option>
@@ -111,12 +111,14 @@ const refreshEmployees = async () => {
     </div>
 
     <!-- Табличная часть (Data Table) -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div
+      class="bg-[var(--color-ui-card)] rounded-xl border border-[var(--color-ui-border)] shadow-xs overflow-hidden"
+    >
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr
-              class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+              class="bg-[var(--color-ui-bg)] border-b border-[var(--color-ui-border)] text-xs font-semibold text-slate-400 uppercase tracking-wider"
             >
               <th class="px-6 py-3">Сотрудник</th>
               <th class="px-6 py-3">Отдел</th>
@@ -162,10 +164,10 @@ const refreshEmployees = async () => {
               <tr
                 v-for="employee in filteredEmployees"
                 :key="employee.id"
-                class="hover:bg-slate-50/50 transition-colors"
+                class="hover:bg-[var(--color-ui-bg)] border-[var(--color-ui-border)] transition-colors"
               >
                 <td class="px-6 py-4">
-                  <div class="font-semibold text-slate-900">{{ employee.name }}</div>
+                  <div class="font-semibold text-[var(--color-ui-text)]">{{ employee.name }}</div>
                   <div class="text-xs text-slate-400 mt-0.5">{{ employee.email }}</div>
                 </td>
                 <td class="px-6 py-4">
