@@ -154,4 +154,32 @@ export const handlers = [
 
     return HttpResponse.json({ success: true, id: deletedEmployee?.id })
   }),
+  // Добавьте эту ручку в массив handlers
+  http.put('/api/employees/:id', async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || authHeader !== 'Bearer valid-senior-access-token') {
+      return new HttpResponse(null, { status: 401 })
+    }
+
+    const { id } = params
+    const updatedData = (await request.json()) as Partial<Employee>
+
+    // Находим сотрудника в нашей InMemory БД
+    const index = employeesDb.findIndex((emp) => emp.id === id)
+
+    if (index === -1) {
+      return new HttpResponse(JSON.stringify({ message: 'Сотрудник не найден' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Обновляем поля сотрудника, сохраняя старый ID и статус
+    employeesDb[index] = {
+      ...employeesDb[index],
+      ...updatedData,
+    }
+
+    return HttpResponse.json(employeesDb[index], { status: 200 })
+  }),
 ]

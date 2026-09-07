@@ -4,6 +4,7 @@ import { apiClient } from '@shared/api/api-client'
 import { BaseButton, BaseInput } from '@shared/ui'
 import { AddEmployeeModal } from '@features/add-employee'
 import { DeleteEmployeeButton } from '@features/delete-employee'
+import { EditEmployeeModal } from '@features/edit-employee' // <-- КРИТИЧЕСКИЙ ИМПОРТ
 
 interface Employee {
   id: string
@@ -196,7 +197,8 @@ const refreshEmployees = async () => {
                 </td>
                 <td class="px-6 py-4 text-right space-x-2">
                   <BaseButton variant="secondary" size="sm">Изменить</BaseButton>
-
+                  <!-- Передаем объект сотрудника текущей строки и подписываемся на обновление списка -->
+                  <EditEmployeeModal :employee="employee" @success="refreshEmployees" />
                   <!-- Наша изолированная фича удаления для каждой строки -->
                   <DeleteEmployeeButton
                     :employee-id="employee.id"
