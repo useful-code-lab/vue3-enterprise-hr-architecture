@@ -5,12 +5,22 @@ import { router } from '@app/providers/router'
 import '@app/styles/main.css'
 
 async function prepareApp() {
-  // Активируем Service Worker только во время локальной разработки
   if (import.meta.env.DEV) {
     const { worker } = await import('@shared/api/mock/browser')
-    // Метод start() возвращает Promise, дожидаемся его активации
+
     await worker.start({
-      onUnhandledRequest: 'bypass', // Игнорируем запросы к ассетам Vite (.vue, .css)
+      // Современный синтаксис MSW v2 для фильтрации запросов
+      onUnhandledRequest(request) {
+        const url = new URL(request.url)
+
+        // Если запрос идет к нашим эндпоинтам API — отдаем его на обработку MSW
+        if (url.pathname.startsWith('/api')) {
+          return
+        }
+
+        // Все внутренние запросы Vite (HMR, ассеты, скрипты) полностью игнорируем
+        return 'bypass'
+      },
     })
   }
 }

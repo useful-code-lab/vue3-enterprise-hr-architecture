@@ -47,36 +47,35 @@ export const router = createRouter({
 })
 
 // 2. Глобальный навигационный гард (Security Guard)
-router.beforeEach(async (to, from, next) => {
+// Обновленный глобальный навигационный гард без устаревшего next()
+router.beforeEach(async (to) => {
   const userStore = useUserStore()
   const token = localStorage.getItem('accessToken')
 
-  // Если токен есть, а профиль еще не загружен в стейт (например, после рефреша страницы)
+  // 1. Инициализация профиля при обновлении страницы (F5)
   if (token && !userStore.isAuthenticated) {
     try {
       await userStore.fetchProfile()
     } catch {
-      // При ошибке запроса профиля (токен невалиден) очищаем стейт и шлем на логин
       userStore.logout()
-      return next({ name: 'login' })
+      return { name: 'login' } // Декларативный редирект вместо next({ name: 'login' })
     }
   }
 
-  // Проверка авторизации
+  // 2. Проверка требований авторизации
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    return next({ name: 'login' })
+    return { name: 'login' }
   }
 
-  // Проверка ролевой модели (RBAC)
+  // 3. Проверка ролевой модели (RBAC)
   if (to.meta.allowedRoles && !userStore.hasRole(to.meta.allowedRoles)) {
-    // Если роль пользователя не входит в список разрешенных
-    return next({ name: 'forbidden' })
+    return { name: 'forbidden' }
   }
 
-  // Если пользователь авторизован и пытается зайти на страницу логина
+  // 4. Если авторизованный пользователь пытается зайти на логин — шлем на дашборд
   if (to.name === 'login' && userStore.isAuthenticated) {
-    return next({ name: 'dashboard' })
+    return { name: 'dashboard' }
   }
 
-  next()
+  // Если ни одно условие не сработало — навигация разрешена автоматически (аналог next())
 })
