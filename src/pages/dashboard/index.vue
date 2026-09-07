@@ -2,7 +2,10 @@
 import { reactive } from 'vue'
 import { useUserStore } from '@entities/user/model/store'
 import { BaseButton } from '@shared/ui'
+import ResourceChart from '@widgets/analytics/ui/ResourceChart.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const userStore = useUserStore()
 
 // Имитируем комплексные бизнес-данные для дашборда
@@ -74,8 +77,13 @@ const handleLogout = () => {
         <div class="flex gap-2">
           <BaseButton variant="secondary" size="md">Экспорт отчета</BaseButton>
           <!-- Кнопка доступна только администраторам и менеджерам (RBAC на практике) -->
-          <BaseButton v-if="userStore.hasRole(['admin', 'manager'])" variant="primary" size="md">
-            + Добавить сотрудника
+          <BaseButton
+            v-if="userStore.hasRole(['admin', 'manager'])"
+            variant="primary"
+            size="md"
+            @click="router.push('/employees')"
+          >
+            Управление персоналом
           </BaseButton>
         </div>
       </div>
@@ -113,15 +121,9 @@ const handleLogout = () => {
       </section>
 
       <!-- Заготовка под графики или тяжелые таблицы -->
-      <section
-        class="bg-white rounded-xl border border-slate-200 p-6 h-64 flex items-center justify-center text-slate-400 text-sm"
-      >
-        <div class="text-center space-y-1">
-          <p class="font-medium text-slate-600">Слой визуализации данных (Charts & Analytics)</p>
-          <p class="text-xs text-slate-400">
-            В следующих шагах здесь будет развернут Canvas/SVG график загрузки команд
-          </p>
-        </div>
+      <!-- В самом низу шаблона src/pages/dashboard/index.vue -->
+      <section class="w-full">
+        <ResourceChart />
       </section>
     </main>
   </div>
